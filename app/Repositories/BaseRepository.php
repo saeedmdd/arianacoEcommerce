@@ -46,7 +46,6 @@ abstract class BaseRepository implements BaseRepositoryInterface
     }
 
     /**
-     * @param Model $model
      * @param array $columns
      * @return Model|null
      */

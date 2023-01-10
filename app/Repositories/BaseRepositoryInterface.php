@@ -9,8 +9,6 @@ use Throwable;
 
 interface BaseRepositoryInterface
 {
-    public function __construct(Model $model);
-
     /**
      * Get all records from the given model
      * @param array|string $columns
