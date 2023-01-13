@@ -43,9 +43,9 @@ interface BaseRepositoryInterface
      * Updates a record from database
      * @param Model $model
      * @param array $columns
-     * @return bool
+     * @return Model|null
      */
-    public function update(Model $model, array $columns): bool;
+    public function update(Model $model, array $columns): ?Model;
 
     /**
      * Deletes the given model data or returns 404

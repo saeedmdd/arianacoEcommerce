@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
+use App\Models\Cart;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -25,6 +28,13 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        Gate::define("user-product", function (User $user ,Product $product)
+        {
+            return $product->user_id === $user->id;
+        });
+
+        Gate::define("user-cart", function (User $user, Cart $cart){
+            return $cart->user_id === $user->id;
+        });
     }
 }

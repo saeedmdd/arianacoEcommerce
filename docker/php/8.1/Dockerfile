@@ -10,7 +10,22 @@ COPY sources.list-iran /etc/apt/sources.list
 #ENV HTTP_PROXY="http://USER_NAME@PASS192.168.1.191:10809"
 RUN apt-get update --fix-missing -y \
         && apt-get upgrade -y \
-        && apt-get install -y nano htop procps
+        && apt-get install -y nano\
+                              htop \
+                              procps \
+                              libpng-dev \
+                              zlib1g-dev \
+                              libonig-dev \
+                              build-essential \
+                              git \
+                              curl \
+                              libfreetype6-dev \
+                              libjpeg62-turbo-dev \
+                              libssl-dev \
+                              libjpeg-dev \
+                              libonig-dev \
+                              libicu-dev
+
 
 RUN apt-get install -y libcurl4-openssl-dev
 RUN docker-php-ext-install curl
@@ -19,6 +34,12 @@ RUN apt-get install -y --no-install-recommends openssl
 
 ######### Mysql client ######
 RUN apt-get install -y default-mysql-client
+
+######### Mysql gb ######
+RUN docker-php-ext-install mbstring
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-install -j$(nproc) gd
+
 
 ########## PHP zip ##########
 RUN apt-get install -y --no-install-recommends libzip-dev unzip \

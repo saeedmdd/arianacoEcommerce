@@ -12,16 +12,17 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(User::class);
             $table->string("name", 50);
             $table->string("description", 500);
-            $table->float("price",6);
-            $table->boolean("status");
+            $table->float("price");
+            $table->boolean("status")->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

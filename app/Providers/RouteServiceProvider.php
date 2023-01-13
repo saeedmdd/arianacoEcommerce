@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
@@ -31,7 +32,17 @@ class RouteServiceProvider extends ServiceProvider
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')
-                ->group(base_path('routes/api.php'));
+                ->group(function () {
+                    Route::group(["prefix" => "v1"], function () {
+                        Route::middleware(["throttle:api", "guest"])
+                            ->prefix("auth")
+                            ->group(base_path("routes/api/v1/auth.php"));
+                        Route::group(["middleware" => "auth:sanctum"], function () {
+                            Route::group(["prefix" => "cart"], base_path("routes/api/v1/cart.php"));
+                            Route::group(["prefix" => "products"],base_path("routes/api/v1/product.php"));
+                        });
+                    });
+                });
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));

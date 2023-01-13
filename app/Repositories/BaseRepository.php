@@ -57,11 +57,12 @@ abstract class BaseRepository implements BaseRepositoryInterface
     /**
      * @param Model $model
      * @param array $columns
-     * @return bool
+     * @return Model|null
      */
-    public function update(Model $model, array $columns): bool
+    public function update(Model $model, array $columns): ?Model
     {
-        return $model->update($columns);
+        $model->update($columns);
+        return $model;
     }
 
     /**
