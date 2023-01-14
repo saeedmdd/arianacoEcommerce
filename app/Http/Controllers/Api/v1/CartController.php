@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Events\SendSMSEvent;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\v1\Cart\StoreCartRequest;
 use App\Http\Requests\Api\v1\Cart\UpdateCartRequest;
@@ -20,14 +21,14 @@ class CartController extends ApiController
 
     public function index()
     {
-        $carts = $this->cartRepository->paginateUser(relations: [ "product"]);
-               return self::success("ok", "carts list",
-                   [
-                       'products' => CartResource::collection($carts),
-                       'links' => CartResource::collection($carts)->response()->getData()->links,
-                       'meta' => CartResource::collection($carts)->response()->getData()->meta
-                   ]
-               );
+        $carts = $this->cartRepository->paginateUser(relations: ["product"]);
+        return self::success("ok", "carts list",
+            [
+                'products' => CartResource::collection($carts),
+                'links' => CartResource::collection($carts)->response()->getData()->links,
+                'meta' => CartResource::collection($carts)->response()->getData()->meta
+            ]
+        );
     }
 
     public function add(StoreCartRequest $request)
@@ -61,15 +62,18 @@ class CartController extends ApiController
 
     public function submit()
     {
-        $this->cartRepository->submit();
+        $submitted = $this->cartRepository->submit(relations: "product");
+        $submitted->map(function ($model) {
+            $products[] = $model->product->name;
+            SendSMSEvent::dispatch("100011", auth()->user()->phone_number, implode("\n", $products));
+        });
         $user = auth()->user()->email;
-        return self::success("ok","carts for user {$user} are submitted",code: Response::HTTP_ACCEPTED);
+        return self::success("ok", "carts for user {$user} are submitted", code: Response::HTTP_ACCEPTED);
     }
 
     public function getSubmitted()
     {
         $submittedCarts = $this->cartRepository->paginatedSubmitted(relations: ["product", "user"]);
-
         return self::success("ok", "submitted carts",
             [
                 'carts' => CartResource::collection($submittedCarts),

@@ -4,6 +4,8 @@ namespace App\Repositories\Cart;
 use App\Models\Cart;
 use App\Repositories\BaseRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class CartRepository extends BaseRepository
 {
@@ -26,13 +28,16 @@ class CartRepository extends BaseRepository
     }
 
 
-    public function submit(): int
+    public function submit(array|string $columns = ["*"], array|string $relations = []): ?Collection
     {
-        return $this->model->query()->whereNull("submitted_at")->where("user_id", auth()->id())->update(["submitted_at" => now()]);
+        $submitted = $this->model->query()->whereNull("submitted_at")->where("user_id", auth()->id());
+        $submitted->update(["submitted_at" => now()]);
+        return $submitted->with($relations)->get($columns);
     }
 
     public function paginatedSubmitted(array|string $columns = ["*"], array|string $relations = [], int $paginate = 15, string $pageName = 'page', int|null $page = null)
     {
         return $this->setBuilder($relations)->whereNotNull("submitted_at")->where("user_id", auth()->id())->paginate($paginate, $columns, $pageName, $page);
     }
+
 }
